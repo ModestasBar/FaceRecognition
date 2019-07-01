@@ -1,7 +1,7 @@
 import React from 'react';
 import './Link.css';
 
-function Link() {
+function Link({onLinkAction, onButtonClick}) {
     return (
         <div>
             <p className='f4 center'>
@@ -9,8 +9,8 @@ function Link() {
             </p>
             <div className='center'>
                 <div className='center form pa3 br3 shadow-5'>
-                    <input className='f5 pa1 w-70'input='text' placeholder='Image URL...'></input>
-                    <button className='f5 br2 link w-30 dim grow white bg-light-purple'>Detect</button>
+                    <input className='f5 pa1 w-70'input='text' placeholder='Image URL...' onChange={onLinkAction}></input>
+                    <button className='f5 br2 link w-30 dim grow white bg-light-purple' onClick={onButtonClick}>Detect</button>
                 </div>
             </div>
         </div>
