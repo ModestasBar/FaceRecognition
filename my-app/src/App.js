@@ -29,8 +29,30 @@ class App extends React.Component {
     super();
     this.state =  {
       input: '',
-      imageURL: ''
+      imageURL: '',
+      box: {}
     }
+  }
+
+  calculateBoxCoordinates = (data) => {
+    const coordinates = (data.outputs[0].data.regions[0].region_info.bounding_box)
+    const imageGrab = document.getElementById('imageId');
+    const width = Number(imageGrab.width);
+    const height = Number(imageGrab.height);
+    return {
+      topRow: height * coordinates.top_row,
+      rightColumn: width - (width * coordinates.right_col),
+      leftColumn: coordinates.left_col * width,
+      bottomRow: height -(coordinates.bottom_row * height)
+
+    }
+  }
+
+  displayFaceBox = (box) => {
+    console.log(box);
+    this.setState({
+      box: box
+    })
   }
 
   onLinkAction = (event) => {
@@ -40,23 +62,16 @@ class App extends React.Component {
   }
 
   
-  onButtonClick = (event) => {
+  onButtonClick = () => {
     this.setState({
       imageURL: this.state.input
     });
-    console.log(event.target)
-      app.models.predict(
-        Clarifai.FACE_DETECT_MODEL, 
-        this.state.input) 
-        .then(
-        function(response) {
-          console.log(response.outputs[0].data.regions[0].region_info.bounding_box);
-        },
-        function(err) {
-          console.log(err)
-        }
-    );
-    console.log(this.state.input)
+
+    app.models.predict(
+      Clarifai.FACE_DETECT_MODEL, 
+      this.state.input) 
+      .then(response => this.displayFaceBox(this.calculateBoxCoordinates(response)))
+      .catch(err => console.log(err))
   }
 
 
@@ -71,7 +86,7 @@ class App extends React.Component {
         onLinkAction={this.onLinkAction}
         onButtonClick={this.onButtonClick}
         />
-      <Image imageURL={this.state.imageURL}/>
+      <Image displayBox={this.state.box} imageURL={this.state.imageURL}/>
      </div>
    );
   }
