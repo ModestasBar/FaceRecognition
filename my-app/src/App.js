@@ -7,6 +7,8 @@ import Logo from './Components/Logo/Logo';
 import Link from './Components/Link/Link';
 import Rank from './Components/Rank/Rank';
 import Image from './Components/Image/Image';
+import LoginForm from './Components/LoginForm/LoginForm';
+import RegistrationForm from './Components/RegistrationForm/RegistrationForm';
 
 const app = new Clarifai.App({
   apiKey: '1da7846f22cb4198a6e67d6085f6bcfc'
@@ -30,7 +32,8 @@ class App extends React.Component {
     this.state =  {
       input: '',
       imageURL: '',
-      box: {}
+      box: {},
+      router: 'sign'
     }
   }
 
@@ -74,19 +77,35 @@ class App extends React.Component {
       .catch(err => console.log(err))
   }
 
+  onRouteChange = (data) => {
+    this.setState({router: data})
+  }
+
 
   render () {
    return (  
      <div>
        <Particles params={particlesOption} className='particles' />
-       <Navigation />
-       <Logo />
-       <Rank />
-       <Link 
-        onLinkAction={this.onLinkAction}
-        onButtonClick={this.onButtonClick}
-        />
-      <Image displayBox={this.state.box} imageURL={this.state.imageURL}/>
+       <Navigation onClick={this.onRouteChange} routerState={this.state.router}/>
+       { this.state.router === 'sign' ?
+        <LoginForm onClick={this.onRouteChange}/>
+         : 
+          (
+            this.state.router === 'register' ?
+            <RegistrationForm  onClick={this.onRouteChange}/>
+            :
+            <div>
+              {console.log(this.state.router)}
+              <Logo />
+              <Rank />
+              <Link 
+                onLinkAction={this.onLinkAction}
+                onButtonClick={this.onButtonClick}
+                />
+              <Image displayBox={this.state.box} imageURL={this.state.imageURL}/>
+            </div>
+          )
+      } 
      </div>
    );
   }
