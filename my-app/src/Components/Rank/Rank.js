@@ -1,13 +1,13 @@
 import React from 'react';
 
-function Rank() {
+function Rank({userName, userScore}) {
     return (
         <div>
             <p className='f4 ma0 center white'>
-                {'Modestas, your rank is...'}
+                {`${userName}, your rank is...`}
             </p>
             <p className='f3 ma1 center white'>
-                {'#5'}
+                {userScore}
             </p>
         </div>
     );
