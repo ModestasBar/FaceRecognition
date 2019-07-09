@@ -33,7 +33,14 @@ class App extends React.Component {
       input: '',
       imageURL: '',
       box: {},
-      router: 'sign'
+      router: 'sign',
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        score: 0,
+        date: ''
+      }
     }
   }
 
@@ -47,7 +54,6 @@ class App extends React.Component {
       rightColumn: width - (width * coordinates.right_col),
       leftColumn: coordinates.left_col * width,
       bottomRow: height -(coordinates.bottom_row * height)
-
     }
   }
 
@@ -73,12 +79,37 @@ class App extends React.Component {
     app.models.predict(
       Clarifai.FACE_DETECT_MODEL, 
       this.state.input) 
-      .then(response => this.displayFaceBox(this.calculateBoxCoordinates(response)))
+      .then(response => {
+        if(response) {
+          fetch('http://localhost:3000/image', {
+            method: 'put',
+            headers: {'Content-type' : 'application/json'},
+            body: JSON.stringify({
+                id: this.state.user.id 
+            })
+        })
+        .then(response => response.json())
+        .then(count => {
+          this.setState(Object.assign(this.state.user,{score: count})) //update object elements 'Object.assign()'
+        })
+        }
+        this.displayFaceBox(this.calculateBoxCoordinates(response))
+      })
       .catch(err => console.log(err))
   }
 
   onRouteChange = (data) => {
     this.setState({router: data})
+  }
+
+  loadUser =(data) => {
+    this.setState({user: {
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      score: data.score,
+      date: data.date
+    }})
   }
 
 
@@ -88,16 +119,16 @@ class App extends React.Component {
        <Particles params={particlesOption} className='particles' />
        <Navigation onClick={this.onRouteChange} routerState={this.state.router}/>
        { this.state.router === 'sign' ?
-        <LoginForm onClick={this.onRouteChange}/>
+        <LoginForm onClick={this.onRouteChange} loadUser={this.loadUser}/>
          : 
           (
             this.state.router === 'register' ?
-            <RegistrationForm  onClick={this.onRouteChange}/>
+            <RegistrationForm  onClick={this.onRouteChange} loadUser={this.loadUser}/>
             :
             <div>
               {console.log(this.state.router)}
               <Logo />
-              <Rank />
+              <Rank userName={this.state.user.name} userScore={this.state.user.score}/>
               <Link 
                 onLinkAction={this.onLinkAction}
                 onButtonClick={this.onButtonClick}
