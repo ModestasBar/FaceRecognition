@@ -21,27 +21,6 @@ const app = express();
 app.use(bodyParse.json());
 app.use(cors());
 
-const dataBase = {
-    users: [
-        {
-            id: '123',
-            name: 'justina',
-            password: 'justina',
-            email: 'mode@gmail.com',
-            score: 0,
-            date: new Date()
-        },
-        {
-            id: '124',
-            name: 'antanas',
-            password: 'antanas',
-            email: 'antanas@gmail.com',
-            score: 0,
-            date: new Date()
-        }
-    ]
-}
-
 app.get('/', (req,res)=> {
     res.json(dataBase.users);
 })
