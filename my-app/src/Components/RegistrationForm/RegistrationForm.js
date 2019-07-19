@@ -29,6 +29,10 @@ class RegistrationForm extends React.Component {
     }
 
     onSubmit = () => {
+        const {userEmail, userPassword, userName} = this.state;
+        if(!userEmail || !userPassword || !userName) {
+            return console.log('Registration error');
+        }
         fetch('http://localhost:3000/register', {
             method: 'post',
             headers: {'Content-type' : 'application/json'},
