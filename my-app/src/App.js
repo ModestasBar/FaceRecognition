@@ -1,7 +1,6 @@
 import React from 'react';
 import Particles from 'react-particles-js';
 import './App.css';
-import Clarifai from 'clarifai';
 import Navigation from './Components/Navigation/Navigation';
 import Logo from './Components/Logo/Logo';
 import Link from './Components/Link/Link';
@@ -10,9 +9,6 @@ import Image from './Components/Image/Image';
 import LoginForm from './Components/LoginForm/LoginForm';
 import RegistrationForm from './Components/RegistrationForm/RegistrationForm';
 
-const app = new Clarifai.App({
-  apiKey: '1da7846f22cb4198a6e67d6085f6bcfc'
- });
 
 const particlesOption = {
   particles: {
@@ -26,10 +22,7 @@ const particlesOption = {
   }
 }
 
-class App extends React.Component {
-  constructor(){
-    super();
-    this.state =  {
+const initialValue = {
       input: '',
       imageURL: '',
       box: {},
@@ -40,8 +33,13 @@ class App extends React.Component {
         email: '',
         score: 0,
         date: ''
-      }
     }
+}
+
+class App extends React.Component {
+  constructor(){
+    super();
+    this.state =  initialValue;
   }
 
   calculateBoxCoordinates = (data) => {
@@ -58,7 +56,6 @@ class App extends React.Component {
   }
 
   displayFaceBox = (box) => {
-    console.log(box);
     this.setState({
       box: box
     })
@@ -76,9 +73,15 @@ class App extends React.Component {
       imageURL: this.state.input
     });
 
-    app.models.predict(
-      Clarifai.FACE_DETECT_MODEL, 
-      this.state.input) 
+      fetch('http://localhost:3000/imagesURL', {
+        method: 'post',
+        headers: {'Content-type' : 'application/json'},
+        body: JSON.stringify({
+            input: this.state.input
+        })
+      })
+      .then(response => response.json())
+      .catch(error => console.log('Unable to use API'))
       .then(response => {
         if(response) {
           fetch('http://localhost:3000/image', {
@@ -87,12 +90,12 @@ class App extends React.Component {
             body: JSON.stringify({
                 id: this.state.user.id 
             })
-        })
-        .then(response => response.json())
-        .then(count => {
+            })
+          .then(response => response.json())
+          .then(count => {
           this.setState(Object.assign(this.state.user,{score: count})) //update object elements 'Object.assign()'
-        })
-        }
+          })
+          }
         this.displayFaceBox(this.calculateBoxCoordinates(response))
       })
       .catch(err => console.log(err))
@@ -100,6 +103,9 @@ class App extends React.Component {
 
   onRouteChange = (data) => {
     this.setState({router: data})
+    if(data === 'sign'){
+      this.setState(initialValue);
+    }
   }
 
   loadUser =(data) => {
@@ -107,7 +113,7 @@ class App extends React.Component {
       id: data.id,
       name: data.name,
       email: data.email,
-      score: data.score,
+      score: data.entries,
       date: data.date
     }})
   }
@@ -126,7 +132,6 @@ class App extends React.Component {
             <RegistrationForm  onClick={this.onRouteChange} loadUser={this.loadUser}/>
             :
             <div>
-              {console.log(this.state.router)}
               <Logo />
               <Rank userName={this.state.user.name} userScore={this.state.user.score}/>
               <Link 
