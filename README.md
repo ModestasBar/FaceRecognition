@@ -1,2 +1,4 @@
 # FaceRecognition
-Application to recognize faces in picture
+Application to recognize face in a picture
+
+
